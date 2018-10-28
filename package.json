@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "node app.js"
+    "serve": "node app.js",
+    "build": "webpack --watch --mode development",
+    "all": "npm run serve & npm run build"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +16,18 @@
     "express": "^4.16.4",
     "morgan": "^1.9.1",
     "multer": "^1.4.1",
-    "swig-templates": "^2.0.3"
+    "swig-templates": "^2.0.3",
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "css-loader": "^1.0.0",
+    "file-loader": "^2.0.0",
+    "style-loader": "^0.23.1",
+    "vue-loader": "^15.4.2",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.23.1",
+    "webpack-cli": "^3.1.2"
   }
 }
