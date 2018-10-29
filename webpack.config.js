@@ -3,7 +3,8 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
     entry: {
-        'main': './src/main.js'
+        'main': './src/main.js',
+        'pdf.worker': 'pdfjs-dist/build/pdf.worker.entry'
     },
     output: {
         filename: '[name].bundle.js',
