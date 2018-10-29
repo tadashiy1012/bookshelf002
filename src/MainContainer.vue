@@ -1,12 +1,12 @@
 <template>
     <div class="container rootContainer">
         <nav class="navbar navbar-light bg-light">
-            <a class="navbar-brand" href="#">Navbar</a>
+            <a class="navbar-brand" href="#"><h1>Navbar</h1></a>
         </nav>
         <div class="row innerContainer">
             <div class="col-sm-2 side">
                 <div class="sideContentConteiner">
-                    <p>left</p>
+                    <navi-content />
                 </div>
             </div>
             <div class="col-sm-10 main">
@@ -24,11 +24,15 @@
     </div>
 </template>
 <script>
+import NaviContent from './NaviContent.vue';
 export default {
     data: function() {
         return {
             subShow: false
         };
+    },
+    components: {
+        NaviContent
     },
     methods: {
         onToggleSub: function() {
@@ -38,6 +42,10 @@ export default {
 }
 </script>
 <style scoped>
+h1 {
+    margin: 0px;
+    font-size: 24px;
+}
 .rootContainer {
     height: 100%;
 }
