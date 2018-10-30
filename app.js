@@ -42,12 +42,12 @@ app.get('/books', async (req, res) => {
 });
 
 // create book
-app.post('/books', upload.single('upload'), async (req, res) => {
+app.post('/books', upload.fields([{name: 'file'}, {name: 'thumb'}]), async (req, res) => {
     let result = {message:'ng'};
     try {
-        const file = req.file.filename;
-        const book = req.body.book;
-        const doc = {book, file};
+        const file = req.files.file[0].filename;
+        const thumb = req.files.thumb[0].filename;
+        const doc = {thumb, file};
         const resp = await put({doc, db: dbbooks});
         result.message = 'ok';
         result.data = resp;
