@@ -4,20 +4,28 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import MainContainer from './MainContainer.vue';
-import {fetchCategories, pushCategory} from './service';
+import {
+    fetchCategories, pushCategory,
+    fetchBooks, pushBook
+} from './service';
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        categories: []
+        categories: [],
+        books: []
     },
     getters: {
-        categories: state => state.categories
+        categories: state => state.categories,
+        books: state => state.books
     },
     mutations: {
         setCategories: (state, payload) => {
-            state.categories = payload.categories
+            state.categories = payload.categories;
+        },
+        setBooks: (state, payload) => {
+            state.books = payload.books;
         }
     },
     actions: {
@@ -29,6 +37,15 @@ const store = new Vuex.Store({
             const resp = await pushCategory(newCategory);
             console.log(resp);
             dispatch('initCategories');
+        },
+        initBooks: async ({commit}) => {
+            const resp = await fetchBooks();
+            commit('setBooks', {books: resp.data});
+        },
+        setBooks: async ({dispatch}, newBook) => {
+            const resp = await pushBook(newBook.file, newBook.thumb);
+            console.log(resp);
+            dispatch('initBooks');
         }
     }
 });

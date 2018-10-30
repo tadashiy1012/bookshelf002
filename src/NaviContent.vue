@@ -2,7 +2,7 @@
     <div>
         <h2>book</h2>
         <div class="form-group">
-            <button id="addCtgrBtn" class="btn btn-primary">add book</button>
+            <button class="btn btn-primary" v-on:click="onAddBook">add book</button>
         </div>
         <h2>category</h2>
         <div class="form-group">
@@ -11,14 +11,15 @@
         <div class="form-group">
             <button class="btn btn-primary" v-on:click="onAddCategory">add category</button>
         </div>
-        <ul>
+        <ul class="list-group list-group-flush">
             <template v-for="(item, idx) in categories">
-                <li :key="idx">{{item.name}}</li>
+                <li :key="idx" class="list-group-item">{{item.name}}</li>
             </template>
         </ul>
     </div>
 </template>
 <script>
+import {getThumbnail} from './service';
 export default {
     computed: {
         categories: function() {
@@ -31,6 +32,16 @@ export default {
             const newCtgr = inCtgr.value;
             if (newCtgr.length === 0) return;
             this.$store.dispatch('setCategories', newCtgr);
+        },
+        onAddBook: function() {
+            const inFile = document.createElement('input');
+            inFile.type = 'file';
+            inFile.addEventListener('change', async (ev) => {
+                const file = ev.target.files[0];
+                const thumb = await getThumbnail(file);
+                this.$store.dispatch('setBooks', {file, thumb});
+            });
+            inFile.click();
         }
     }
 }
