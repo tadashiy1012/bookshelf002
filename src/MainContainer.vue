@@ -12,13 +12,30 @@
             <div class="col-sm-10 main">
                 <div :class="'mainContentContainer ' + (subShow ? 'mainContentContainer-grid' : 'mainContentContainer-block')">
                     <div class="mainContentMain">
-                        <h2>category:<span>{{category}}</span></h2>
-                        <p>main</p>
-                        <button type="button" class="btn btn-primary" v-on:click="onToggleSub" :disabled="subShowEnabled">toggle sub</button>
-                        <p>{{books.length}}/{{uncategorized.length}}</p>
+                        <div class="contentHeader">
+                            <h2>category:<span>{{category}}</span> <span>count:{{books.length}}</span></h2>
+                            <button type="button" class="btn btn-primary" v-on:click="onToggleSub" :disabled="subShowEnabled">open sub</button>
+                        </div>
+                        <ul class="booksWrapper">
+                            <template v-for="(item, idx) in books">
+                                <li :key="idx">
+                                    <img class="bookImg" :src="item.objUrl" />
+                                </li>
+                            </template>
+                        </ul>
                     </div>
                     <div :class="'mainContentSub ' + (subShow ? '' : 'mainContentSub-hide')">
-                        <p>sub</p>
+                        <div class="contentHeader">
+                            <h2>uncategorized:<span>{{uncategorized.length}}</span></h2>
+                            <button type="button" class="btn btn-primary" v-on:click="onCloseSub">close sub</button>
+                        </div>
+                        <ul class="booksWrapper">
+                            <template v-for="(item, idx) in uncategorized">
+                                <li :key="idx">
+                                    <img class="bookImg" :src="item.objUrl" />
+                                </li>
+                            </template>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -26,12 +43,14 @@
     </div>
 </template>
 <script>
+import {fetchBookThumb} from './service';
 import NaviContent from './NaviContent.vue';
 export default {
     data: function() {
         return {
             subShow: false,
-            subShowEnabled: true
+            subShowEnabled: true,
+            currentPath: this.$route.path
         };
     },
     computed: {
@@ -47,26 +66,44 @@ export default {
             const categories = this.$store.getters.categories;
             const current = this.category;
             const category = categories.find((elm) => elm.name === current);
-            if (category === void 0) return all;
-            let filtered = [];
-            category.books.forEach(elm => {
-                const found = all.find(one => one._id === elm);
-                if (found) filtered = [...filtered, found];
+            let result = null;
+            if (category === void 0) { 
+                result = all;
+            } else {
+                let filtered = [];
+                category.books.forEach(elm => {
+                    const found = all.find(one => one._id === elm);
+                    if (found) filtered = [...filtered, found];
+                });
+                result = filtered;
+            }
+            result.forEach(async (elm) => {
+                const blob = await fetchBookThumb(elm);
+                elm.objUrl = window.URL.createObjectURL(blob);
             });
-            return filtered;
+            return result;
         },
         uncategorized: function() {
             const all = this.$store.getters.books;
             const categories = this.$store.getters.categories;
             const current = this.category;
             const category = categories.find((elm) => elm.name === current);
-            if (category === void 0) return [];
-            let filtered = [];
-            category.books.forEach(elm => {
-                const found = all.filter(one => one._id !== elm);
-                if (found) filtered = [...filtered, ...found];
+            let result = null;
+            if (category === void 0) { 
+                result = [];
+            } else {
+                let filtered = [];
+                category.books.forEach(elm => {
+                    const found = all.filter(one => one._id !== elm);
+                    if (found) filtered = [...filtered, ...found];
+                });
+                result = filtered;
+            }
+            result.forEach(async (elm) => {
+                const blob = await fetchBookThumb(elm);
+                elm.objUrl = window.URL.createObjectURL(blob);
             });
-            return filtered;
+            return result;
         }
     },
     components: {
@@ -75,6 +112,16 @@ export default {
     methods: {
         onToggleSub: function() {
             this.subShow = !this.subShow;
+        },
+        onCloseSub: function() {
+            this.subShow = false;
+        }
+    },
+    updated: function() {
+        const path = this.$route.path;
+        if (this.currentPath !== path) {
+            this.currentPath = path;
+            this.subShow = false;
         }
     }
 }
@@ -112,5 +159,24 @@ h1 {
 }
 .mainContentSub-hide {
     display: none;
+}
+.booksWrapper {
+    display: flex;
+    flex-direction: row;
+    padding-left: 0px;
+}
+.booksWrapper > li {
+    list-style-type: none;
+    margin: 2px;
+}
+.bookImg {
+    border: solid 1px gray;
+}
+.contentHeader {
+    display: flex;
+    flex-direction: row;
+}
+.contentHeader > * {
+    margin-right: 8px;
 }
 </style>

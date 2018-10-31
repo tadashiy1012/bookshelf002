@@ -57,6 +57,19 @@ const pushBook = (file, thumbnail) => {
     });
 };
 
+const fetchBookThumb = (book) => {
+    return new Promise((resolve, reject) => {
+        const id = book._id;
+        fetch('/books/thumb/' + id).then((resp) => {
+            return resp.blob();
+        }).then((result) => {
+            resolve(result);
+        }).catch((err) => {
+            reject(err);
+        });
+    });
+};
+
 const makeThumbnail = (file) => {
     return new Promise((resolve, reject) => {
         const fr = new FileReader();
@@ -82,6 +95,6 @@ const makeThumbnail = (file) => {
 
 export {
     fetchCategories, pushCategory,
-    fetchBooks, pushBook, 
+    fetchBooks, pushBook, fetchBookThumb,
     makeThumbnail
 };

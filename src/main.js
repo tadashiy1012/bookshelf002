@@ -27,7 +27,9 @@ const store = new Vuex.Store({
             state.categories = payload.categories;
         },
         setBooks: (state, payload) => {
-            state.books = payload.books;
+            const books = payload.books;
+            books.forEach(elm => elm.objUrl = null);
+            state.books = books;
         }
     },
     actions: {
