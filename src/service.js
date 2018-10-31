@@ -57,7 +57,7 @@ const pushBook = (file, thumbnail) => {
     });
 };
 
-const getThumbnail = (file) => {
+const makeThumbnail = (file) => {
     return new Promise((resolve, reject) => {
         const fr = new FileReader();
         fr.addEventListener('load', async (ev) => {
@@ -83,5 +83,5 @@ const getThumbnail = (file) => {
 export {
     fetchCategories, pushCategory,
     fetchBooks, pushBook, 
-    getThumbnail
+    makeThumbnail
 };

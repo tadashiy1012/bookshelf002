@@ -21,7 +21,7 @@
     </div>
 </template>
 <script>
-import {getThumbnail} from './service';
+import {makeThumbnail} from './service';
 export default {
     computed: {
         categories: function() {
@@ -41,7 +41,7 @@ export default {
             inFile.type = 'file';
             inFile.addEventListener('change', async (ev) => {
                 const file = ev.target.files[0];
-                const thumb = await getThumbnail(file);
+                const thumb = await makeThumbnail(file);
                 this.$store.dispatch('setBooks', {file, thumb});
             });
             inFile.click();
