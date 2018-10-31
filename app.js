@@ -58,6 +58,58 @@ app.post('/books', upload.fields([{name: 'file'}, {name: 'thumb'}]), async (req,
     res.json(result);
 });
 
+// fetch thumbnail
+app.get('/books/thumb/:id', async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const db = dbbooks;
+        const doc = await get({query: {_id: id}, db});
+        if (doc.length === 0) throw new Error('target not found');
+        var option = {
+            root: __dirname + '/upload/',
+            dotfiles: 'deny',
+            headers: {'x-timestamp': Date.now(),'x-sent': true}
+        };
+        const filename = doc[0].thumb;
+        res.sendFile(filename, option, (err) => {
+            if (err) {
+                next(err);
+            } else {
+                console.log('sent:', filename);
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
+
+// fetch file
+app.get('/books/file/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const db = dbbooks;
+        const doc = await get({query: {_id: id}, db});
+        if (doc.length === 0) throw new Error('target not found');
+        var option = {
+            root: __dirname + '/upload/',
+            dotfiles: 'deny',
+            headers: {'x-timestamp': Date.now(),'x-sent': true}
+        };
+        const filename = doc[0].file;
+        res.sendFile(filename, option, (err) => {
+            if (err) {
+                next(err);
+            } else {
+                console.log('sent:', filename);
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
+
 // read category
 app.get('/categories', async (req, res) => {
     let result = {message: 'ng'};
