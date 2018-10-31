@@ -12,8 +12,10 @@
             <div class="col-sm-10 main">
                 <div :class="'mainContentContainer ' + (subShow ? 'mainContentContainer-grid' : 'mainContentContainer-block')">
                     <div class="mainContentMain">
+                        <h2>category:<span>{{category}}</span></h2>
                         <p>main</p>
-                        <button type="button" class="btn btn-primary" v-on:click="onToggleSub">toggle sub</button>
+                        <button type="button" class="btn btn-primary" v-on:click="onToggleSub" :disabled="subShowEnabled">toggle sub</button>
+                        <p>{{books.length}}/{{uncategorized.length}}</p>
                     </div>
                     <div :class="'mainContentSub ' + (subShow ? '' : 'mainContentSub-hide')">
                         <p>sub</p>
@@ -28,8 +30,44 @@ import NaviContent from './NaviContent.vue';
 export default {
     data: function() {
         return {
-            subShow: false
+            subShow: false,
+            subShowEnabled: true
         };
+    },
+    computed: {
+        category: function() {
+            const path = this.$route.path.substring(1);
+            const category = path === '' ? 'all' : path;
+            if (category === 'all') { this.subShowEnabled = true; }
+            else { this.subShowEnabled = false; }
+            return category;
+        },
+        books: function() {
+            const all = this.$store.getters.books;
+            const categories = this.$store.getters.categories;
+            const current = this.category;
+            const category = categories.find((elm) => elm.name === current);
+            if (category === void 0) return all;
+            let filtered = [];
+            category.books.forEach(elm => {
+                const found = all.find(one => one._id === elm);
+                if (found) filtered = [...filtered, found];
+            });
+            return filtered;
+        },
+        uncategorized: function() {
+            const all = this.$store.getters.books;
+            const categories = this.$store.getters.categories;
+            const current = this.category;
+            const category = categories.find((elm) => elm.name === current);
+            if (category === void 0) return [];
+            let filtered = [];
+            category.books.forEach(elm => {
+                const found = all.filter(one => one._id !== elm);
+                if (found) filtered = [...filtered, ...found];
+            });
+            return filtered;
+        }
     },
     components: {
         NaviContent

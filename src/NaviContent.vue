@@ -13,7 +13,9 @@
         </div>
         <ul class="list-group list-group-flush">
             <template v-for="(item, idx) in categories">
-                <li :key="idx" class="list-group-item">{{item.name}}</li>
+                <li :key="idx" class="list-group-item">
+                    <router-link :to="item.name">{{item.name}}</router-link>
+                </li>
             </template>
         </ul>
     </div>
@@ -23,7 +25,8 @@ import {getThumbnail} from './service';
 export default {
     computed: {
         categories: function() {
-            return this.$store.getters.categories;
+            const categories = [{name: 'all', books:[]}, ...this.$store.getters.categories];
+            return categories;
         }
     },
     methods: {

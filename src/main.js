@@ -3,6 +3,7 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Vue from 'vue';
 import Vuex from 'vuex';
+import VueRouter from 'vue-router';
 import MainContainer from './MainContainer.vue';
 import {
     fetchCategories, pushCategory,
@@ -10,6 +11,7 @@ import {
 } from './service';
 
 Vue.use(Vuex);
+Vue.use(VueRouter);
 
 const store = new Vuex.Store({
     state: {
@@ -50,6 +52,8 @@ const store = new Vuex.Store({
     }
 });
 
+const router = new VueRouter({routes: []});
+
 const app = new Vue({
     el: '#app',
     template: '<main-container />',
@@ -57,8 +61,10 @@ const app = new Vue({
         MainContainer
     },
     store,
+    router,
     created: function() {
         this.$store.dispatch('initCategories');
+        this.$store.dispatch('initBooks');
     }
 });
 
