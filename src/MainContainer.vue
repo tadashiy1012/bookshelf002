@@ -14,12 +14,16 @@
                     <div class="mainContentMain">
                         <div class="contentHeader">
                             <h2>category:<span>{{category}}</span> <span>count:{{books.length}}</span></h2>
-                            <button type="button" class="btn btn-primary" v-on:click="onToggleSub" :disabled="subShowEnabled">open sub</button>
+                            <button type="button" class="btn btn-primary"
+                                :disabled="subShowEnabled"
+                                v-on:click="onToggleSub">
+                                add or remove book
+                            </button>
                         </div>
-                        <ul class="booksWrapper">
+                        <ul class="booksWrapper" v-on:dragstart="dragStartAdd" v-on:dragover="over" v-on:dragleave="leave" v-on:drop="dropAdd">
                             <template v-for="(item, idx) in books">
                                 <li :key="idx">
-                                    <img class="bookImg" :src="item.objUrl" />
+                                    <img class="bookImg" :src="item.objUrl" draggable="true" :data-book="JSON.stringify(item)" />
                                 </li>
                             </template>
                         </ul>
@@ -29,10 +33,10 @@
                             <h2>uncategorized:<span>{{uncategorized.length}}</span></h2>
                             <button type="button" class="btn btn-primary" v-on:click="onCloseSub">close sub</button>
                         </div>
-                        <ul class="booksWrapper">
+                        <ul class="booksWrapper" v-on:dragstart="dragStartRm" v-on:dragover="over" v-on:dragleave="leave" v-on:drop="dropRm">
                             <template v-for="(item, idx) in uncategorized">
                                 <li :key="idx">
-                                    <img class="bookImg" :src="item.objUrl" />
+                                    <img class="bookImg" :src="item.objUrl" draggable="true" :data-book="JSON.stringify(item)" />
                                 </li>
                             </template>
                         </ul>
@@ -45,12 +49,19 @@
 <script>
 import {fetchBookThumb} from './service';
 import NaviContent from './NaviContent.vue';
+const getBookData = (dataStr) => {
+    const div = document.createElement('div');
+    div.innerHTML = dataStr;
+    return JSON.parse(div.firstElementChild.dataset['book']);
+};
 export default {
     data: function() {
         return {
             subShow: false,
             subShowEnabled: true,
-            currentPath: this.$route.path
+            currentPath: this.$route.path,
+            addStart: false,
+            rmStart: false
         };
     },
     computed: {
@@ -104,17 +115,58 @@ export default {
                 elm.objUrl = window.URL.createObjectURL(blob);
             });
             return result;
-        }
+        },
     },
     components: {
         NaviContent
     },
     methods: {
         onToggleSub: function() {
-            this.subShow = !this.subShow;
+            this.subShow = true;
+            this.addStart = false;
+            this.rmStart = false;
         },
         onCloseSub: function() {
             this.subShow = false;
+            this.addStart = false;
+            this.rmStart = false;
+        },
+        dragStartAdd: function(ev) {
+            this.addStart = true;
+            this.rmStart = false;
+            let tgt = ev.target;
+            ev.dataTransfer.setData('rm', tgt.outerHTML);
+        },
+        dragStartRm: function(ev) {
+            this.rmStart = true;
+            this.addStart = false;
+            let tgt = ev.target;
+            ev.dataTransfer.setData('add', tgt.outerHTML);
+        },
+        over: function(ev) {
+            ev.preventDefault();
+            ev.dataTransfer.dropEffect = 'move';
+        },
+        leave: function(ev) {
+            ev.preventDefault();
+        },
+        dropAdd: function(ev) {
+            ev.stopPropagation();
+            if (!this.rmStart) { return; }
+            this.rmStart = false;
+            this.addStart = false;
+            const data = ev.dataTransfer.getData('add');
+            const book = getBookData(data);
+            console.log(book);
+        },
+        dropRm: function(ev) {
+            ev.stopPropagation();
+            if (!this.addStart) { return; }
+            this.rmStart = false;
+            this.addStart = false;
+            const data = ev.dataTransfer.getData('rm');
+            const book = getBookData(data);
+            console.log(book);
         }
     },
     updated: function() {
